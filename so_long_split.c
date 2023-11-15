@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_split.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/15 17:54:26 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/15 20:37:54 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,57 +45,11 @@ typedef struct s_game
 {
 	char	*game;
 	char 	*map_line;
-	char	**map;
+	char	**map_matrix;
 	int		map_x;
 	int		map_y;
-	int		collectables;
-	int		walls;
-	int		spaces;
-	int		exit;
 }				t_game;
 
-/*
-
-					! ZONA GUARRA !
-
-*/
-char	*long_strjoin(char *s1, char *s2)
-{
-	int		i;
-	int		j;
-	char	*str;
-
-	if (!s1 && !s2)
-		return (NULL);
-	if (!s1 && s2)
-		return (ft_strdup(s2));
-	i = 0;
-	j = 0;
-	str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!str)
-		return (free(s1), NULL);
-	while (s1 != NULL && s1[i] != '\0')
-	{
-		if (str[i] == '\n')
-			i++;
-		str[i] = s1[i];
-		i++;
-	}
-	while (s2 != NULL && s2[j] != '\0')
-	{
-		if (str[i + j] == '\n')
-			j++;
-		str[i + j] = s2[j];
-		j++;
-	}
-	str[i + j] = '\0';
-	return (free(s1), str);
-}
-/*
-
-					! FIN DE ZONA GUARRA !
-
-*/
 void	ft_error(char *error)
 {
 	ft_putstr_fd (error, 1);
@@ -130,7 +84,7 @@ void	ft_check_for_elements(char *mapline)
 void	ft_check_for_characters(char *mapline)
 {
 	int	i;
-
+	
 	i = 0;
 	while (mapline[i] != '\0')
 	{
@@ -141,87 +95,78 @@ void	ft_check_for_characters(char *mapline)
 		i++;
 	}
 }
-// void	ft_check_for_walls(t_game *game)
-// {
-// 	int	i;
-// 	int	j;
-// 	int len_x
+void	ft_check_for_walls(t_game *game)
+{
+	int	x;
+	int y;
 	
-// 	len_x =	strange_strlen()
-// 	i = -1;
-// 	j = -1;
-	
-// 	while (game->map_y[++i])
-// 	{
-// 		if (game->map_y[i] != 1)
-// 			ft_error("Error: Invalid map (Invalid walls)")
-// 		if ()
-// 	}
-	
-// }
+	y = -1;
+	x = 0;
+	printf("%i \n", game->map_y);
+	while (game->map_matrix[++y])
+	{
+		while (game->map_matrix[y][x])
+		{
+			if (game->map_matrix[0][x] != '1'|| game->map_matrix[game->map_y - 1][x] != '1')
+				ft_error("ERROR ONE");
+			else if (game->map_matrix[y][0] != '1' || game->map_matrix[y][game->map_x - 1] != '1')
+				ft_error("error two");
+			x++;
+		}
+		x = 0;
+		
+	}
+}
 void	ft_check_for_rectangle(t_game *game)
 {
-	int area;
-	int len;
+	int	i;
+	int j;
 
-	len = ft_strlen(game->map_line);
-	area = game->map_x * game->map_y;
-	printf("area %i, mapx = %i, mapy = %i, len = %i \n", area, game->map_x, game->map_y, len);
-	if ((len - 3) != area )
+	i = 0;
+	j = 0;
+	game->map_x = ft_strlen(game->map_matrix[j]);
+	while(game->map_matrix[++j])
 	{
-		ft_error("Error: Invalid map (Not squared)");
+		if(game->map_x != ft_strlen(game->map_matrix[j]))
+			ft_error("square");
 	}
+	game->map_y = j;
 }
 
 void	ft_check_valid_map(t_game *game)
 {
-	// * Funcion para comprobar que existan una unica saluda y puntos de partida, y al menos un coleccionable
 	ft_check_for_elements(game->map_line);
-	// * Funcion para comprobar que no existan caracteres distitntos a los validos en el mapa
 	ft_check_for_characters(game->map_line);
-	// ! Comprobar que el mapa este enteramente rodeado por muros 
-	//	ft_check_for_walls(&game)
-	// ! Comprobar que exista el menos un camino valido en hasta la salida, y que es camino hacia el coleccionable sea viable
-	// ! Comprobar si e mapa es rectangular (probllema en determinados casos)
 	ft_check_for_rectangle(game);
+	ft_check_for_walls(game);
+	// ! Comprobar que exista el menos un camino valido en hasta la salida, y que es camino hacia el coleccionable sea viable
+	
 }
-
+char	**ft_split_the_map(t_game *game)
+{
+	game->map_matrix = ft_split(game->map_line, '\n');
+	return(game->map_matrix);
+}
 void	ft_read_map(t_game *game)
 {
 	int		fd;
-	char	*line;
-	// ! Llamar a funcion para verificar si es .ber
+	char	readed;
+	// ! Llamar a funcion para verificar si es .bER
+	
 	fd = open("./Maps/map.ber", O_RDONLY);
-	if (fd < 0)
-	{
-		ft_error("Error: Unable to open map");
-	}
-	line = get_next_line(fd);
-	if (!line)
-	{
-		ft_error("Error: The map is empty");
-	}
-	game->map_x = (ft_strlen(line) - 1);
-	free(line);
-	game->map_line = NULL;
-	while (line)
-	{
-		// ! Problema en el strjoin
-		game->map_line = gnl_strjoin(game->map_line, line);
-		line = get_next_line(fd);
-		game->map_y++;
-		printf("%s\n", game->map_line);
-		// if (game->map_x != ft_strlen(line) - 1)
-		// 	ft_error("TOPOTAMADRE");
-	}
+	game->map_line = malloc((BUFFER_SIZE) * sizeof(char));
+	readed = read(fd, game->map_line, BUFFER_SIZE);
+	if (readed == -1)
+		ft_error("READMAP ERROR");
+	game->map_line[readed] = '\0';
+	printf("%s \n", game->map_line);
 	close(fd);
+	ft_split_the_map(game);
 	ft_check_valid_map(game);
 }
-/*Funcion presionar teclas*/
+
 int	ft_deal_key(int key, t_vars *vars)
 {
-	int steps;
-
 	if (key == KEY_A)
 		printf("Ha presionado A \n");
 	if (key == KEY_W)
@@ -247,6 +192,13 @@ int	ft_deal_key(int key, t_vars *vars)
 	return 0;
 }
 
+int	ft_close(t_vars *vars)
+{
+	mlx_destroy_window(vars->mlx, vars->mlx_win);
+	exit (1);
+	return (0);
+}
+
 int	main(void)
 {
 	t_game	game;
@@ -255,6 +207,7 @@ int	main(void)
 	vars.mlx = mlx_init();
 	vars.mlx_win = mlx_new_window(vars.mlx, 1080, 1080, "so_long");
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
+	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
 	ft_read_map(&game);
 	// ! mlx_loop_hook(vars.mlx, &ft_steps, &vars);
 	mlx_loop(vars.mlx);
