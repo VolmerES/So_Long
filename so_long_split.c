@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/15 20:37:54 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/16 18:36:42 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ typedef struct s_game
 	char	**map_matrix;
 	int		map_x;
 	int		map_y;
+	int		p_y;
+	int		p_x;
 }				t_game;
 
 void	ft_error(char *error)
@@ -55,66 +57,93 @@ void	ft_error(char *error)
 	ft_putstr_fd (error, 1);
 	exit (1);
 }
-
-void	ft_check_for_elements(char *mapline)
+int	ft_path_cross_checker(t_game *game)
 {
-	int i;
+// ! 
+}
+void	ft_check_for_path(t_game *game)
+{
+	// ! Reservar espacio para hacer una copia de mi mapa, para rellenarla de unos ya quqe la vamos a destrozar
+	// ! Mientras haya contenido en mi matriz hacer una copia con strdup
+	// ! 
+	ft_path_cross_checker(game) != 1)
+		
+}
+
+void	ft_check_for_elements(t_game *game)
+{
+	int y;
 	int j;
 	int k;
 	int e;
+	int x;
 
-	i = 0;
+	y = -1;
 	j = 0;
 	k = 0;
 	e = 0;
-	while (mapline[i++])
+	while (game->map_matrix[++y])
 	{
-		if (mapline[i] == 'C')
-			j++;
-		if (mapline[i] == 'E')
-			k++;
-		if (mapline[i] == 'P')
-			e++;
+		x = -1;
+		while (game->map_matrix[y][++x])
+		{
+			if (game->map_matrix[y][x] == 'C')
+				j++;
+			if (game->map_matrix[y][x] == 'E')
+				k++;
+			if (game->map_matrix[y][x] == 'P')
+				e++;
+		}
 	}
 	if (j != 1 || k != 1 || e != 1)
 		ft_error("Error: Invalid Map (Not enough elements)");
 }
 
-// ! Arreglar la condicion del salto de linea
-void	ft_check_for_characters(char *mapline)
+void	ft_check_for_characters(t_game *game)
 {
-	int	i;
+	int	x;
+	int y;
 	
-	i = 0;
-	while (mapline[i] != '\0')
+	x = -1;
+	y = -1;
+	while (game->map_matrix[++y])
 	{
-		if (mapline[i] != 'C' && mapline[i] != 'E' && mapline[i] != 'P' && mapline[i] != '1' && mapline[i] != '0' && mapline[i] != '\n')
+		x = -1;
+		while (game->map_matrix[y][++x]) 
 		{
-			ft_error("Error: Invalid map (Invalid symbols)");
+			if (game->map_matrix[y][x] == 'P')
+			{
+				game->p_x = x;
+				game->p_y = y;
+			}
+			if (((game->map_matrix[y][x] != 'C'
+					&& game->map_matrix[y][x] != 'E' &&
+					game->map_matrix[y][x] != 'P' && game->map_matrix[y][x] != '1' &&
+					game->map_matrix[y][x] != '0')))
+			{
+				ft_error("Error: Invalid map (Invalid characters)");
+			}
 		}
-		i++;
 	}
 }
+
 void	ft_check_for_walls(t_game *game)
 {
 	int	x;
 	int y;
 	
 	y = -1;
-	x = 0;
 	printf("%i \n", game->map_y);
 	while (game->map_matrix[++y])
 	{
-		while (game->map_matrix[y][x])
+		x = -1;
+		while (game->map_matrix[y][++x])
 		{
 			if (game->map_matrix[0][x] != '1'|| game->map_matrix[game->map_y - 1][x] != '1')
 				ft_error("ERROR ONE");
 			else if (game->map_matrix[y][0] != '1' || game->map_matrix[y][game->map_x - 1] != '1')
 				ft_error("error two");
-			x++;
 		}
-		x = 0;
-		
 	}
 }
 void	ft_check_for_rectangle(t_game *game)
@@ -125,6 +154,7 @@ void	ft_check_for_rectangle(t_game *game)
 	i = 0;
 	j = 0;
 	game->map_x = ft_strlen(game->map_matrix[j]);
+	j = -1;
 	while(game->map_matrix[++j])
 	{
 		if(game->map_x != ft_strlen(game->map_matrix[j]))
@@ -135,12 +165,11 @@ void	ft_check_for_rectangle(t_game *game)
 
 void	ft_check_valid_map(t_game *game)
 {
-	ft_check_for_elements(game->map_line);
-	ft_check_for_characters(game->map_line);
+	ft_check_for_elements(game);
+	ft_check_for_characters(game);
 	ft_check_for_rectangle(game);
 	ft_check_for_walls(game);
-	// ! Comprobar que exista el menos un camino valido en hasta la salida, y que es camino hacia el coleccionable sea viable
-	
+	// ft_check_for_path(game);
 }
 char	**ft_split_the_map(t_game *game)
 {
