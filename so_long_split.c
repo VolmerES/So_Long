@@ -6,17 +6,9 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/16 18:36:42 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/17 18:19:29 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/*            || PARTE DE CODIGO DEL JUEGO ||								
- ! Comprobacion de que el mapa es de extension .ber 							
- * Funcion de lectura del mapa con GNL										
- ! Comprobacion que el mapa contenga P, E, C y las paredes sean 1 			
- ! Hacer que al presionar "X" tecla se mueva hacia esa posicion 				
- ! Funcion para contar los pasos reales que da el jugador 					
- ! Que el jugador no pueda entrar dentro de las paredes */						
 
 #include "mlx/mlx.h"
 #include <unistd.h>
@@ -34,6 +26,7 @@
 # define ARROW_DOWN		125
 # define ARROW_LEFT		123
 # define ARROW_RIGHT	124
+# define RED_TEXT "\033[31m"
 
 typedef struct s_vars
 {
@@ -46,6 +39,7 @@ typedef struct s_game
 	char	*game;
 	char 	*map_line;
 	char	**map_matrix;
+	char	**map_matrix_copy;
 	int		map_x;
 	int		map_y;
 	int		p_y;
@@ -57,16 +51,60 @@ void	ft_error(char *error)
 	ft_putstr_fd (error, 1);
 	exit (1);
 }
-int	ft_path_cross_checker(t_game *game)
+void	ft_check_for_collectables(t_game *game)
 {
-// ! 
+	int	y;
+	int x;
+	
+	y = -1;
+	while (game->map_matrix_copy[++y])
+	{
+		x = -1;
+		while (game->map_matrix_copy[y][++x])
+		{
+			if (game->map_matrix_copy[y][x] == 'C')
+				ft_error("ERROR: Not all collectables are reachable");
+		}
+	}
 }
-void	ft_check_for_path(t_game *game)
+int	ft_path_cross_checker(char **map_matrix_copy, int p_y, int p_x)
 {
-	// ! Reservar espacio para hacer una copia de mi mapa, para rellenarla de unos ya quqe la vamos a destrozar
-	// ! Mientras haya contenido en mi matriz hacer una copia con strdup
-	// ! 
-	ft_path_cross_checker(game) != 1)
+	int	flag;
+	
+	flag = 0;
+	if (map_matrix_copy[p_y][p_x] == 'E')
+		return (1);
+	else
+		map_matrix_copy[p_y][p_x] = '1';
+	if (map_matrix_copy[p_y][p_x + 1] != '1')
+		flag += ft_path_cross_checker(map_matrix_copy, p_y, p_x + 1);
+	if (map_matrix_copy[p_y][p_x - 1] != '1')
+		flag += ft_path_cross_checker(map_matrix_copy, p_y, p_x - 1);
+	if (map_matrix_copy[p_y + 1][p_x] != '1')
+		flag += ft_path_cross_checker(map_matrix_copy, p_y + 1, p_x);
+	if (map_matrix_copy[p_y - 1][p_x] != '1')
+		flag += ft_path_cross_checker(map_matrix_copy, p_y - 1, p_x);
+	return (flag);
+}
+void	ft_check_for_path_recursive(t_game *game)
+{
+	int	y;
+	int	valid;
+	int x;
+	
+	y = -1;
+	game->map_matrix_copy = (char **)malloc((game->map_y + 1) * (sizeof (char *)));
+	while (game->map_matrix[++y])
+	{
+		game->map_matrix_copy[y] = ft_strdup(game->map_matrix[y]),
+		printf("%s \n", game->map_matrix_copy[y]);
+	}
+	valid = ft_path_cross_checker(game->map_matrix_copy, game->p_y, game->p_x);
+	if (valid  == 0)
+		ft_error("ERROR: No avaliable path");
+	ft_check_for_collectables(game);
+	// ! Liberar memoria del mapa
+	
 		
 }
 
@@ -121,7 +159,7 @@ void	ft_check_for_characters(t_game *game)
 					game->map_matrix[y][x] != 'P' && game->map_matrix[y][x] != '1' &&
 					game->map_matrix[y][x] != '0')))
 			{
-				ft_error("Error: Invalid map (Invalid characters)");
+				ft_error("ERROR: Invalid map (Invalid characters)");
 			}
 		}
 	}
@@ -140,9 +178,9 @@ void	ft_check_for_walls(t_game *game)
 		while (game->map_matrix[y][++x])
 		{
 			if (game->map_matrix[0][x] != '1'|| game->map_matrix[game->map_y - 1][x] != '1')
-				ft_error("ERROR ONE");
+				ft_error("ERROR: Invalid map (Not surrounded by walls)");
 			else if (game->map_matrix[y][0] != '1' || game->map_matrix[y][game->map_x - 1] != '1')
-				ft_error("error two");
+				ft_error("ERROR: Invalid map (Not surrounded by walls)");
 		}
 	}
 }
@@ -158,7 +196,7 @@ void	ft_check_for_rectangle(t_game *game)
 	while(game->map_matrix[++j])
 	{
 		if(game->map_x != ft_strlen(game->map_matrix[j]))
-			ft_error("square");
+			ft_error("ERROR: Invalid map (Not rectangular)");
 	}
 	game->map_y = j;
 }
@@ -169,7 +207,7 @@ void	ft_check_valid_map(t_game *game)
 	ft_check_for_characters(game);
 	ft_check_for_rectangle(game);
 	ft_check_for_walls(game);
-	// ft_check_for_path(game);
+	ft_check_for_path_recursive(game);
 }
 char	**ft_split_the_map(t_game *game)
 {
@@ -180,13 +218,12 @@ void	ft_read_map(t_game *game)
 {
 	int		fd;
 	char	readed;
-	// ! Llamar a funcion para verificar si es .bER
 	
 	fd = open("./Maps/map.ber", O_RDONLY);
 	game->map_line = malloc((BUFFER_SIZE) * sizeof(char));
 	readed = read(fd, game->map_line, BUFFER_SIZE);
 	if (readed == -1)
-		ft_error("READMAP ERROR");
+		ft_error("ERROR: The map could not be read");
 	game->map_line[readed] = '\0';
 	printf("%s \n", game->map_line);
 	close(fd);
@@ -230,6 +267,16 @@ int	ft_close(t_vars *vars)
 
 int	main(void)
 {
+	// ! Llevarme el el inicio de la mlxlib a otra funcion
+	// ! Estructurar mi main con argumentos
+	// ! Llamar a funcion para verificar si es .ber
+	// ! Funcion para contar los pasos reales que da el jugador 					
+ 	// ! Que el jugador no pueda entrar dentro de las paredes
+	// ! Establecer la imagenes y el movimiento del jugador
+	// ! Establecer la animaicones
+	// ! Establecer un limite de mapa.
+	// ! Cambiar el printf por el mio.
+	
 	t_game	game;
 	t_vars	vars;
 	
