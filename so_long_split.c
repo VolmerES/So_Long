@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/17 18:19:29 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/23 19:25:18 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,10 @@ void	ft_check_for_collectables(t_game *game)
 		while (game->map_matrix_copy[y][++x])
 		{
 			if (game->map_matrix_copy[y][x] == 'C')
+			{
 				ft_error("ERROR: Not all collectables are reachable");
+				free (game->map_matrix_copy);
+			}
 		}
 	}
 }
@@ -97,17 +100,15 @@ void	ft_check_for_path_recursive(t_game *game)
 	while (game->map_matrix[++y])
 	{
 		game->map_matrix_copy[y] = ft_strdup(game->map_matrix[y]),
-		printf("%s \n", game->map_matrix_copy[y]);
+		printf("SEGUNDO CHECK:\n%s\n", game->map_matrix_copy[y]);
 	}
 	valid = ft_path_cross_checker(game->map_matrix_copy, game->p_y, game->p_x);
 	if (valid  == 0)
 		ft_error("ERROR: No avaliable path");
 	ft_check_for_collectables(game);
-	// ! Liberar memoria del mapa
-	
-		
+	free (game->map_matrix_copy);
 }
-
+ 
 void	ft_check_for_elements(t_game *game)
 {
 	int y;
@@ -171,7 +172,7 @@ void	ft_check_for_walls(t_game *game)
 	int y;
 	
 	y = -1;
-	printf("%i \n", game->map_y);
+	printf("NUMERO FILAS:%i \n", game->map_y);
 	while (game->map_matrix[++y])
 	{
 		x = -1;
@@ -209,25 +210,32 @@ void	ft_check_valid_map(t_game *game)
 	ft_check_for_walls(game);
 	ft_check_for_path_recursive(game);
 }
-char	**ft_split_the_map(t_game *game)
+void	ft_read_map(t_game *game, char *arg)
 {
-	game->map_matrix = ft_split(game->map_line, '\n');
-	return(game->map_matrix);
-}
-void	ft_read_map(t_game *game)
-{
-	int		fd;
 	char	readed;
+	char	*temp_map_line;
+	int		fd;
 	
-	fd = open("./Maps/map.ber", O_RDONLY);
-	game->map_line = malloc((BUFFER_SIZE) * sizeof(char));
-	readed = read(fd, game->map_line, BUFFER_SIZE);
-	if (readed == -1)
+	readed = 0;
+	temp_map_line = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!temp_map_line)
+		return;
+	fd = open(arg, O_RDONLY);
+	if (fd < 0)
+	{
+		free (temp_map_line);
 		ft_error("ERROR: The map could not be read");
-	game->map_line[readed] = '\0';
-	printf("%s \n", game->map_line);
+	}
+	readed = read(fd, temp_map_line, BUFFER_SIZE);
+	if (readed == -1)
+	{
+		free (temp_map_line);
+		ft_error("ERROR: The map could not be read");
+	}
+	game->map_matrix = ft_split(temp_map_line, '\n');
+	printf("PRIMER CHECK:\n%s\n", temp_map_line);
+	free (temp_map_line);
 	close(fd);
-	ft_split_the_map(game);
 	ft_check_valid_map(game);
 }
 
@@ -264,10 +272,16 @@ int	ft_close(t_vars *vars)
 	exit (1);
 	return (0);
 }
+// void	ft_check_ber(char *arg)
+// {
+// 	int	i;
 
-int	main(void)
+// 	i = ft_strlen((arg) - 1);
+// 	if (arg[i] != 'r' || arg[i - 1] != 'e' || arg[i - 2] != 'b' || arg[i - 3] != '.')
+// 		ft_error("ERROR: Wrong map extension");
+// }
+int	main(int argc, char **argv)
 {
-	// ! Llevarme el el inicio de la mlxlib a otra funcion
 	// ! Estructurar mi main con argumentos
 	// ! Llamar a funcion para verificar si es .ber
 	// ! Funcion para contar los pasos reales que da el jugador 					
@@ -279,13 +293,18 @@ int	main(void)
 	
 	t_game	game;
 	t_vars	vars;
+	int		fd;
 	
+	fd = open(argv[1], O_RDONLY);
+	if (argc != 2)
+		ft_error("ERROR: Not valid arguments");
+	//ft_check_ber(argv[1]);
+	ft_read_map(&game, argv[1]);
+	close (fd);
 	vars.mlx = mlx_init();
 	vars.mlx_win = mlx_new_window(vars.mlx, 1080, 1080, "so_long");
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
 	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
-	ft_read_map(&game);
-	// ! mlx_loop_hook(vars.mlx, &ft_steps, &vars);
 	mlx_loop(vars.mlx);
 	return 0;
 }
