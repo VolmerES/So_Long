@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/24 15:25:36 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/24 18:01:44 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # define ARROW_DOWN		125
 # define ARROW_LEFT		123
 # define ARROW_RIGHT	124
-# define RED_TEXT "\033[31m"
+# define RED_TEXT 		"\033[31m"
 
 typedef struct s_vars
 {
@@ -36,6 +36,11 @@ typedef struct s_vars
 
 typedef struct s_game
 {
+	char	*player_img;
+	char	*wall_img;
+	char	*exit_img;
+	char	*ground_img;
+	char	*collectable_img;
 	char	*game;
 	char 	*map_line;
 	char	**map_matrix;
@@ -44,6 +49,8 @@ typedef struct s_game
 	int		map_y;
 	int		p_y;
 	int		p_x;
+	int		img_width;
+	int		img_height;
 }				t_game;
 
 void	ft_error(char *error)
@@ -51,6 +58,45 @@ void	ft_error(char *error)
 	ft_putstr_fd (error, 1);
 	exit (1);
 }
+
+// !  ||||  PONER IMAGENES EN MAPA   ||||
+
+
+void	ft_put_img(t_vars *vars, t_game *game)
+{
+	int		y;
+	int		x;
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->player_img, game->p_y, game->p_x);
+	
+	y = -1;
+	while (game->map_matrix[++y])
+	{
+		x = -1;
+		while (game->map_matrix[y][++x])
+		{
+			if (game->map_matrix[y][x] == '1')
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->wall_img, y * 32, x * 32);
+			if (game->map_matrix[y][x] == 'C')
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->collectable_img, y * 32, x * 32);
+			if (game->map_matrix[y][x] == 'E')
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->exit_img, y * 32, x * 32);
+			if (game->map_matrix[y][x] == '0')
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->ground_img, y * 32, x * 32);
+		}
+	}
+}
+void	ft_set_img(t_vars *vars, t_game *game)
+{
+	game->player_img = mlx_xpm_file_to_image(vars->mlx, "./img/Hobbit.xpm", &game->img_width, &game->img_height);
+	game->wall_img = mlx_xpm_file_to_image(vars->mlx, "./img/Walls.xpm", &game->img_width, &game->img_height);
+	game->collectable_img = mlx_xpm_file_to_image(vars->mlx, "./img/Collectable.xpm", &game->img_width, &game->img_height);
+	game->exit_img = mlx_xpm_file_to_image(vars->mlx, "./img/Exit.xpm", &game->img_width, &game->img_height);
+	game->ground_img = mlx_xpm_file_to_image(vars->mlx, "./img/Ground.xpm", &game->img_width, &game->img_height);
+	ft_put_img(vars, game);
+}
+
+ // !    |||| CHECK FOR VALID PATH ||||
+ 
 void	ft_check_for_collectables(t_game *game)
 {
 	int	y;
@@ -103,6 +149,9 @@ void	ft_check_for_path_recursive(t_game *game)
 		free (game->map_matrix_copy[y++]);
 	free (game->map_matrix_copy);
 }
+ 
+ // !  ||||   CHECK FOR VALID MAP   ||||
+
  
 void	ft_check_for_elements(t_game *game)
 {
@@ -205,6 +254,7 @@ void	ft_check_valid_map(t_game *game)
 	ft_check_for_walls(game);
 	ft_check_for_path_recursive(game);
 }
+// !   ||||   MLX INIT AND READ MAP   ||||
 void	ft_read_map(t_game *game, char *arg)
 {
 	char	readed;
@@ -276,13 +326,16 @@ void	ft_check_ber(char *arg)
 	if (arg[i - 1] != 'r' || arg[i - 2] != 'e' || arg[i - 3] != 'b' || arg[i - 4] != '.')
 		ft_error("ERROR: Wrong map extension");
 }
+void	ft_mlx_initialiter(t_vars *vars, t_game *game)
+{
+	vars->mlx = mlx_init();
+	vars->mlx_win = mlx_new_window(vars->mlx, game->map_y * 32, game->map_x * 32 , "so_long");
+}
 int	main(int argc, char **argv)
 {
-	// ! Estructurar mi main con argumentos
-	// ! Llamar a funcion para verificar si es .ber
 	// ! Funcion para contar los pasos reales que da el jugador 					
  	// ! Que el jugador no pueda entrar dentro de las paredes
-	// ! Establecer la imagenes y el movimiento del jugador
+	// ! el movimiento del jugador
 	// ! Establecer la animaicones
 	// ! Establecer un limite de mapa.
 	// ! Cambiar el printf por el mio.
@@ -293,10 +346,10 @@ int	main(int argc, char **argv)
 	
 	if (argc != 2)
 		ft_error("ERROR: Not valid arguments");
-	// ft_check_ber(argv[1]);
+	ft_check_ber(argv[1]);
 	ft_read_map(&game, argv[1]);
-	vars.mlx = mlx_init();
-	vars.mlx_win = mlx_new_window(vars.mlx, 1080, 1080, "so_long");
+	ft_mlx_initialiter(&vars, &game);
+	ft_set_img(&vars, &game);
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
 	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
 	mlx_loop(vars.mlx);
