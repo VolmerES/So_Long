@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/23 19:25:18 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/24 15:25:36 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,21 +91,16 @@ int	ft_path_cross_checker(char **map_matrix_copy, int p_y, int p_x)
 }
 void	ft_check_for_path_recursive(t_game *game)
 {
-	int	y;
 	int	valid;
-	int x;
+	int	y;
 	
-	y = -1;
-	game->map_matrix_copy = (char **)malloc((game->map_y + 1) * (sizeof (char *)));
-	while (game->map_matrix[++y])
-	{
-		game->map_matrix_copy[y] = ft_strdup(game->map_matrix[y]),
-		printf("SEGUNDO CHECK:\n%s\n", game->map_matrix_copy[y]);
-	}
+	y = 0;
 	valid = ft_path_cross_checker(game->map_matrix_copy, game->p_y, game->p_x);
 	if (valid  == 0)
 		ft_error("ERROR: No avaliable path");
 	ft_check_for_collectables(game);
+	while (game->map_matrix_copy[y])
+		free (game->map_matrix_copy[y++]);
 	free (game->map_matrix_copy);
 }
  
@@ -217,7 +212,7 @@ void	ft_read_map(t_game *game, char *arg)
 	int		fd;
 	
 	readed = 0;
-	temp_map_line = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	temp_map_line = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!temp_map_line)
 		return;
 	fd = open(arg, O_RDONLY);
@@ -233,6 +228,7 @@ void	ft_read_map(t_game *game, char *arg)
 		ft_error("ERROR: The map could not be read");
 	}
 	game->map_matrix = ft_split(temp_map_line, '\n');
+	game->map_matrix_copy = ft_split(temp_map_line, '\n');
 	printf("PRIMER CHECK:\n%s\n", temp_map_line);
 	free (temp_map_line);
 	close(fd);
@@ -272,14 +268,14 @@ int	ft_close(t_vars *vars)
 	exit (1);
 	return (0);
 }
-// void	ft_check_ber(char *arg)
-// {
-// 	int	i;
+void	ft_check_ber(char *arg)
+{
+	size_t	i;
 
-// 	i = ft_strlen((arg) - 1);
-// 	if (arg[i] != 'r' || arg[i - 1] != 'e' || arg[i - 2] != 'b' || arg[i - 3] != '.')
-// 		ft_error("ERROR: Wrong map extension");
-// }
+	i = ft_strlen(arg);
+	if (arg[i - 1] != 'r' || arg[i - 2] != 'e' || arg[i - 3] != 'b' || arg[i - 4] != '.')
+		ft_error("ERROR: Wrong map extension");
+}
 int	main(int argc, char **argv)
 {
 	// ! Estructurar mi main con argumentos
@@ -295,12 +291,10 @@ int	main(int argc, char **argv)
 	t_vars	vars;
 	int		fd;
 	
-	fd = open(argv[1], O_RDONLY);
 	if (argc != 2)
 		ft_error("ERROR: Not valid arguments");
-	//ft_check_ber(argv[1]);
+	// ft_check_ber(argv[1]);
 	ft_read_map(&game, argv[1]);
-	close (fd);
 	vars.mlx = mlx_init();
 	vars.mlx_win = mlx_new_window(vars.mlx, 1080, 1080, "so_long");
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
