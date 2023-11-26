@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/24 18:01:44 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/26 18:26:09 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,15 @@
 # define ARROW_RIGHT	124
 # define RED_TEXT 		"\033[31m"
 
+typedef struct s_game t_game;
+typedef struct s_vars t_vars;
+int	ft_close(t_vars *vars);
+
 typedef struct s_vars
 {
 	void	*mlx;
 	void	*mlx_win;
+	t_game	*game;
 }				t_vars;
 
 typedef struct s_game
@@ -51,6 +56,8 @@ typedef struct s_game
 	int		p_x;
 	int		img_width;
 	int		img_height;
+	int		coins;
+	int		steps;
 }				t_game;
 
 void	ft_error(char *error)
@@ -59,40 +66,145 @@ void	ft_error(char *error)
 	exit (1);
 }
 
+// !  ||||  MOVIMIENTO JUGADOR   ||||
+
+void	ft_move_right(t_vars *vars)
+{
+	t_game *game;
+
+	game = vars->game;
+	
+	if (game->map_matrix[game->p_y][game->p_x + 1] != '1')
+	{
+		if (game->map_matrix[game->p_y][game->p_x + 1] == 'C')
+			game->coins--;
+		if (game->map_matrix[game->p_y][game->p_x + 1] == 'E')
+			{
+				if (game->coins == 0)
+					ft_close(vars);	
+				else
+					return ;
+			}
+		game->map_matrix[game->p_y][game->p_x] = '0';
+		game->map_matrix[game->p_y][game->p_x + 1] = 'P';
+		game->p_x += 1;
+		game->steps++;
+	}
+}
+void	ft_move_up(t_vars *vars)
+{
+	t_game *game;
+
+	game = vars->game;
+	
+	if (game->map_matrix[game->p_y - 1][game->p_x] != '1')
+	{
+		if (game->map_matrix[game->p_y - 1][game->p_x] == 'C')
+			game->coins--;
+		if (game->map_matrix[game->p_y - 1][game->p_x] == 'E')
+			{
+				if (game->coins == 0)
+					ft_close(vars);	
+				else
+					return ;
+			}
+		game->map_matrix[game->p_y][game->p_x] = '0';
+		game->map_matrix[game->p_y - 1][game->p_x] = 'P';
+		game->p_y -= 1;
+		game->steps++;
+	}
+}
+void	ft_move_down(t_vars *vars)
+{
+	t_game *game;
+
+	game = vars->game;
+	
+	if (game->map_matrix[game->p_y + 1][game->p_x] != '1')
+	{
+		if (game->map_matrix[game->p_y + 1][game->p_x] == 'C')
+			game->coins--;
+		if (game->map_matrix[game->p_y + 1][game->p_x] == 'E')
+			{
+				if (game->coins == 0)
+					ft_close(vars);	
+				else
+					return ;
+			}
+		game->map_matrix[game->p_y][game->p_x] = '0';
+		game->map_matrix[game->p_y + 1][game->p_x] = 'P';
+		game->p_y += 1;
+		game->steps++;
+	}
+}
+void	ft_move_left(t_vars *vars)
+{
+	t_game *game;
+
+	game = vars->game;
+	
+	if (game->map_matrix[game->p_y][game->p_x - 1] != '1')
+	{
+		if (game->map_matrix[game->p_y][game->p_x - 1] == 'C')
+			game->coins--;
+		if (game->map_matrix[game->p_y][game->p_x - 1] == 'E')
+			{
+				if (game->coins == 0)
+					ft_close(vars);	
+				else
+					return ;
+			}
+		game->map_matrix[game->p_y][game->p_x] = '0';
+		game->map_matrix[game->p_y][game->p_x - 1] = 'P';
+		game->p_x -= 1;
+		game->steps++;
+	}
+}
+
 // !  ||||  PONER IMAGENES EN MAPA   ||||
 
 
-void	ft_put_img(t_vars *vars, t_game *game)
+void	ft_put_img(t_vars *vars)
 {
 	int		y;
 	int		x;
-	mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->player_img, game->p_y, game->p_x);
+	
+	t_game *game;
+
+	game = vars->game;
+	mlx_clear_window(vars->mlx, vars->mlx_win);
+	mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->player_img, game->p_x * 128, game->p_y * 128);
 	
 	y = -1;
 	while (game->map_matrix[++y])
 	{
+		printf("SEGUNDO CHECK: %s \n", game->map_matrix[y]);
 		x = -1;
 		while (game->map_matrix[y][++x])
 		{
 			if (game->map_matrix[y][x] == '1')
-				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->wall_img, y * 32, x * 32);
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->wall_img, x * 128, y * 128);
 			if (game->map_matrix[y][x] == 'C')
-				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->collectable_img, y * 32, x * 32);
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->collectable_img, x * 128, y * 128);
 			if (game->map_matrix[y][x] == 'E')
-				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->exit_img, y * 32, x * 32);
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->exit_img, x * 128, y * 128);
 			if (game->map_matrix[y][x] == '0')
-				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->ground_img, y * 32, x * 32);
+				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->ground_img, x * 128, y * 128);
 		}
 	}
 }
-void	ft_set_img(t_vars *vars, t_game *game)
+int	ft_set_img(t_vars *vars)
 {
+	t_game *game;
+
+	game = vars->game;
 	game->player_img = mlx_xpm_file_to_image(vars->mlx, "./img/Hobbit.xpm", &game->img_width, &game->img_height);
 	game->wall_img = mlx_xpm_file_to_image(vars->mlx, "./img/Walls.xpm", &game->img_width, &game->img_height);
 	game->collectable_img = mlx_xpm_file_to_image(vars->mlx, "./img/Collectable.xpm", &game->img_width, &game->img_height);
 	game->exit_img = mlx_xpm_file_to_image(vars->mlx, "./img/Exit.xpm", &game->img_width, &game->img_height);
 	game->ground_img = mlx_xpm_file_to_image(vars->mlx, "./img/Ground.xpm", &game->img_width, &game->img_height);
-	ft_put_img(vars, game);
+	ft_put_img(vars);
+	return (0);
 }
 
  // !    |||| CHECK FOR VALID PATH ||||
@@ -156,13 +268,12 @@ void	ft_check_for_path_recursive(t_game *game)
 void	ft_check_for_elements(t_game *game)
 {
 	int y;
-	int j;
 	int k;
 	int e;
 	int x;
 
 	y = -1;
-	j = 0;
+	game->coins = 0;
 	k = 0;
 	e = 0;
 	while (game->map_matrix[++y])
@@ -171,14 +282,14 @@ void	ft_check_for_elements(t_game *game)
 		while (game->map_matrix[y][++x])
 		{
 			if (game->map_matrix[y][x] == 'C')
-				j++;
+				game->coins++;
 			if (game->map_matrix[y][x] == 'E')
 				k++;
 			if (game->map_matrix[y][x] == 'P')
 				e++;
 		}
 	}
-	if (j != 1 || k != 1 || e != 1)
+	if (game->coins < 1 || k != 1 || e != 1)
 		ft_error("Error: Invalid Map (Not enough elements)");
 }
 
@@ -287,22 +398,14 @@ void	ft_read_map(t_game *game, char *arg)
 
 int	ft_deal_key(int key, t_vars *vars)
 {
-	if (key == KEY_A)
-		printf("Ha presionado A \n");
-	if (key == KEY_W)
-		printf("Ha presionado W \n");
-	if (key == KEY_S)
-		printf("Ha presionado S \n");
-	if (key == KEY_D)
-		printf("Ha presionado D \n");
-	if (key == ARROW_RIGHT)
-		printf("Ha presionado DERECHA \n");
-	if (key == ARROW_LEFT)
-		printf("Ha presionado IZQUIERDA \n");
-	if (key == ARROW_DOWN)
-		printf("Ha presionado ABAJO \n");
-	if (key == ARROW_UP)
-		printf("Ha presionado ARRIBA \n");
+	if (key == KEY_A || key == ARROW_LEFT)
+		ft_move_left(vars);
+	if (key == KEY_W || key == ARROW_UP)
+		ft_move_up(vars);
+	if (key == KEY_S || key == ARROW_DOWN)
+		ft_move_down(vars);
+	if (key == KEY_D || key == ARROW_RIGHT)
+		ft_move_right(vars);
 	if (key == KEY_ESC)
 	{
 		printf("Ha presionado ESC \n");
@@ -329,16 +432,12 @@ void	ft_check_ber(char *arg)
 void	ft_mlx_initialiter(t_vars *vars, t_game *game)
 {
 	vars->mlx = mlx_init();
-	vars->mlx_win = mlx_new_window(vars->mlx, game->map_y * 32, game->map_x * 32 , "so_long");
+	vars->mlx_win = mlx_new_window(vars->mlx, game->map_x * 128, game->map_y * 128 , "so_long");
 }
 int	main(int argc, char **argv)
 {
 	// ! Funcion para contar los pasos reales que da el jugador 					
- 	// ! Que el jugador no pueda entrar dentro de las paredes
-	// ! el movimiento del jugador
 	// ! Establecer la animaicones
-	// ! Establecer un limite de mapa.
-	// ! Cambiar el printf por el mio.
 	
 	t_game	game;
 	t_vars	vars;
@@ -346,12 +445,14 @@ int	main(int argc, char **argv)
 	
 	if (argc != 2)
 		ft_error("ERROR: Not valid arguments");
+	vars.game = &game;
 	ft_check_ber(argv[1]);
 	ft_read_map(&game, argv[1]);
 	ft_mlx_initialiter(&vars, &game);
-	ft_set_img(&vars, &game);
+	// ft_set_img(&vars);
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
 	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
+	mlx_loop_hook(vars.mlx, ft_set_img, &vars);
 	mlx_loop(vars.mlx);
 	return 0;
 }
