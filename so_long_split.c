@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/26 20:22:02 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/26 22:05:03 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,23 @@ typedef struct s_game
 	int		step_flag;
 }				t_game;
 
-int	ft_count_steps(t_game *game)
+void	ft_steps_window(t_vars *vars)
 {
+	char	*str;
+	char	*aux;
+	
+	str = ft_itoa(vars->game->steps);
+	aux = ft_strjoin("Steps: ", str);
+	mlx_string_put(vars->mlx, vars->mlx_win, 50, 50, 0x00FF0000, aux);
+	free (str);
+	free (aux);
+}
+int	ft_count_steps(t_vars *vars)
+{
+	t_game	*game;
+	char	*str;
+
+	game = vars->game;
 	if (game->step_flag == 1)
 	{
 		ft_putstr_fd("Steps: ", 1);
@@ -184,13 +199,12 @@ void	ft_put_img(t_vars *vars)
 {
 	int		y;
 	int		x;
-	
 	t_game *game;
 
 	game = vars->game;
 	mlx_clear_window(vars->mlx, vars->mlx_win);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->player_img, game->p_x * 128, game->p_y * 128);
-	ft_count_steps(game);
+	ft_count_steps(vars);
 	y = -1;
 	while (game->map_matrix[++y])
 	{
@@ -207,6 +221,7 @@ void	ft_put_img(t_vars *vars)
 				mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->ground_img, x * 128, y * 128);
 		}
 	}
+	ft_steps_window(vars);
 }
 int	ft_set_img(t_vars *vars)
 {
@@ -451,12 +466,12 @@ void	ft_mlx_initialiter(t_vars *vars, t_game *game)
 }
 int	main(int argc, char **argv)
 {
-	// ! Funcion para contar los pasos reales que da el jugador 					
 	// ! Establecer la animaicones
 	
 	t_game	game;
 	t_vars	vars;
 	int		fd;
+	char	*str = "Hola";
 	
 	if (argc != 2)
 		ft_error("ERROR: Not valid arguments");
@@ -467,7 +482,6 @@ int	main(int argc, char **argv)
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
 	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
 	mlx_loop_hook(vars.mlx, ft_set_img, &vars);
-	//mlx_loop_hook(vars.mlx, &loop_hook, &game);
 	mlx_loop(vars.mlx);
 	return 0;
 }
