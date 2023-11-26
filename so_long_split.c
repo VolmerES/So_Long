@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/26 18:26:09 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/11/26 20:22:02 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,20 @@ typedef struct s_game
 	int		img_height;
 	int		coins;
 	int		steps;
+	int		step_flag;
 }				t_game;
 
+int	ft_count_steps(t_game *game)
+{
+	if (game->step_flag == 1)
+	{
+		ft_putstr_fd("Steps: ", 1);
+		ft_putnbr_fd(game->steps, 1);
+		ft_putchar_fd('\n', 1);
+		game->step_flag = 0;
+	}
+	return (0);
+}
 void	ft_error(char *error)
 {
 	ft_putstr_fd (error, 1);
@@ -89,6 +101,7 @@ void	ft_move_right(t_vars *vars)
 		game->map_matrix[game->p_y][game->p_x + 1] = 'P';
 		game->p_x += 1;
 		game->steps++;
+		game->step_flag = 1; 
 	}
 }
 void	ft_move_up(t_vars *vars)
@@ -112,6 +125,7 @@ void	ft_move_up(t_vars *vars)
 		game->map_matrix[game->p_y - 1][game->p_x] = 'P';
 		game->p_y -= 1;
 		game->steps++;
+		game->step_flag = 1;
 	}
 }
 void	ft_move_down(t_vars *vars)
@@ -135,6 +149,7 @@ void	ft_move_down(t_vars *vars)
 		game->map_matrix[game->p_y + 1][game->p_x] = 'P';
 		game->p_y += 1;
 		game->steps++;
+		game->step_flag = 1;
 	}
 }
 void	ft_move_left(t_vars *vars)
@@ -158,6 +173,7 @@ void	ft_move_left(t_vars *vars)
 		game->map_matrix[game->p_y][game->p_x - 1] = 'P';
 		game->p_x -= 1;
 		game->steps++;
+		game->step_flag = 1;
 	}
 }
 
@@ -174,11 +190,10 @@ void	ft_put_img(t_vars *vars)
 	game = vars->game;
 	mlx_clear_window(vars->mlx, vars->mlx_win);
 	mlx_put_image_to_window(vars->mlx, vars->mlx_win, game->player_img, game->p_x * 128, game->p_y * 128);
-	
+	ft_count_steps(game);
 	y = -1;
 	while (game->map_matrix[++y])
 	{
-		printf("SEGUNDO CHECK: %s \n", game->map_matrix[y]);
 		x = -1;
 		while (game->map_matrix[y][++x])
 		{
@@ -449,10 +464,10 @@ int	main(int argc, char **argv)
 	ft_check_ber(argv[1]);
 	ft_read_map(&game, argv[1]);
 	ft_mlx_initialiter(&vars, &game);
-	// ft_set_img(&vars);
 	mlx_key_hook(vars.mlx_win, ft_deal_key, &vars);
 	mlx_hook(vars.mlx_win, 17, 0, ft_close, &vars);
 	mlx_loop_hook(vars.mlx, ft_set_img, &vars);
+	//mlx_loop_hook(vars.mlx, &loop_hook, &game);
 	mlx_loop(vars.mlx);
 	return 0;
 }
