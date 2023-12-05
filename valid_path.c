@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:46:07 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/28 14:44:56 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/12/05 15:20:16 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	ft_check_for_collectables(t_game *game)
 			}
 		}
 	}
-}
+} 
 
 int	ft_path_cross_checker(char **map_matrix_copy, int p_y, int p_x)
 {

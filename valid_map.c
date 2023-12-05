@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:47:30 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/28 14:49:24 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/12/05 14:55:01 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ void	ft_check_for_rectangle(t_game *game)
 	j = -1;
 	while (game->map_matrix[++j])
 	{
-		if (game->map_x != ft_strlen(game->map_matrix[j]))
+		if (game->map_x != (int)ft_strlen(game->map_matrix[j]))
 			ft_error("ERROR: Invalid map (Not rectangular)");
 	}
 	game->map_y = j;

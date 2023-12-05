@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/27 18:34:16 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/12/05 15:10:07 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ int	main(int argc, char **argv)
 {
 	t_game	game;
 	t_vars	vars;
-	int		fd;
 
 	if (argc != 2)
 		ft_error("ERROR: Not valid arguments");
