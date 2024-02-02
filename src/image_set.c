@@ -6,11 +6,11 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:50:15 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/27 18:09:27 by jdelorme         ###   ########.fr       */
+/*   Updated: 2024/02/02 14:32:48 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "../inc/so_long.h"
 
 void	ft_put_img_util(t_vars *vars, int y, int x)
 {

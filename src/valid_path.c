@@ -6,11 +6,11 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:46:07 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/12/05 15:20:16 by jdelorme         ###   ########.fr       */
+/*   Updated: 2024/02/02 16:56:53 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "../inc/so_long.h"
 
 void	ft_check_for_collectables(t_game *game)
 {
@@ -25,12 +25,12 @@ void	ft_check_for_collectables(t_game *game)
 		{
 			if (game->map_matrix_copy[y][x] == 'C')
 			{
-				ft_error("ERROR: Not all collectables are reachable");
+				ft_error("Error\n Not all collectables are reachable\n");
 				free (game->map_matrix_copy);
 			}
 		}
 	}
-} 
+}
 
 int	ft_path_cross_checker(char **map_matrix_copy, int p_y, int p_x)
 {
@@ -60,7 +60,7 @@ void	ft_check_for_path_recursive(t_game *game)
 	y = 0;
 	valid = ft_path_cross_checker(game->map_matrix_copy, game->p_y, game->p_x);
 	if (valid == 0)
-		ft_error("ERROR: No avaliable path");
+		ft_error("Error\n No avaliable path\n");
 	ft_check_for_collectables(game);
 	while (game->map_matrix_copy[y])
 		free (game->map_matrix_copy[y++]);

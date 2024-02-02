@@ -6,16 +6,16 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:31:47 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/11/28 14:39:19 by jdelorme         ###   ########.fr       */
+/*   Updated: 2024/02/02 14:37:29 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "mlx/mlx.h"
+#include "../mlx/mlx.h"
 #include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "libft/libft.h"
+#include "../libft/libft.h"
 
 #define KEY_ESC			53
 #define KEY_W			13

@@ -6,11 +6,11 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 18:16:48 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/12/05 15:10:07 by jdelorme         ###   ########.fr       */
+/*   Updated: 2024/02/02 16:50:52 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "../inc/so_long.h"
 
 void	ft_read_map(t_game *game, char *arg)
 {
@@ -26,13 +26,13 @@ void	ft_read_map(t_game *game, char *arg)
 	if (fd < 0)
 	{
 		free (temp_map_line);
-		ft_error("ERROR: The map could not be read");
+		ft_error("Error\n The map could not be read\n");
 	}
 	readed = read(fd, temp_map_line, BUFFER_SIZE);
 	if (readed == -1)
 	{
 		free (temp_map_line);
-		ft_error("ERROR: The map could not be read");
+		ft_error("Error\n The map could not be read\n");
 	}
 	game->map_matrix = ft_split(temp_map_line, '\n');
 	game->map_matrix_copy = ft_split(temp_map_line, '\n');
@@ -67,7 +67,7 @@ void	ft_check_ber(char *arg)
 	i = ft_strlen(arg);
 	if (arg[i - 1] != 'r' || arg[i - 2] != 'e'
 		||arg[i - 3] != 'b' || arg[i - 4] != '.')
-		ft_error("ERROR: Wrong map extension");
+		ft_error("Error\n Wrong map extension\n");
 }
 
 int	main(int argc, char **argv)
@@ -76,7 +76,7 @@ int	main(int argc, char **argv)
 	t_vars	vars;
 
 	if (argc != 2)
-		ft_error("ERROR: Not valid arguments");
+		ft_error("Error\n Not valid arguments\n");
 	vars.game = &game;
 	ft_check_ber(argv[1]);
 	ft_read_map(&game, argv[1]);

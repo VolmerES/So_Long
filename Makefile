@@ -1,11 +1,11 @@
 NAME = so_long
 CC = gcc
-SRC =	so_long.c \
-		image_set.c \
-		mlx_utils.c \
-		player_movement.c \
-		valid_map.c \
-		valid_path.c
+SRC =	./src/so_long.c \
+		./src/image_set.c \
+		./src/mlx_utils.c \
+		./src/player_movement.c \
+		./src/valid_map.c \
+		./src/valid_path.c
 
 
 OBJS = $(SRC:.c=.o)
@@ -28,13 +28,13 @@ $(FT_LIB) :
 	@make -C ./libft/
 
 %.o : %.c
-	@$(CC) -c $(CFLAGS) $?
+	@$(CC) -c $(CFLAGS) $? -o $@
 
 BONUS : $(OBJS_BONUS) $(OBJS)
 	@ar -crs $(NAME) $?
 
 clean:
-	@rm -f *.o
+	@rm -f $(OBJS)
 	@make clean -C ./libft/
 	@make clean -C ./mlx/
 run:

@@ -6,11 +6,11 @@
 /*   By: jdelorme <jdelorme@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:47:30 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/12/05 14:55:01 by jdelorme         ###   ########.fr       */
+/*   Updated: 2024/02/02 16:52:00 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "../inc/so_long.h"
 
 void	ft_check_for_elements(t_game *game)
 {
@@ -37,7 +37,7 @@ void	ft_check_for_elements(t_game *game)
 		}
 	}
 	if (game->coins < 1 || k != 1 || e != 1)
-		ft_error("Error: Invalid Map (Not enough elements)");
+		ft_error("Error\n Invalid Map (Not enough elements)\n");
 }
 
 void	ft_check_for_characters(t_game *game)
@@ -62,7 +62,7 @@ void	ft_check_for_characters(t_game *game)
 				&& game->map_matrix[y][x] != '1'
 				&& game->map_matrix[y][x] != '0')))
 			{
-				ft_error("ERROR: Invalid map (Invalid characters)");
+				ft_error("Error\n Invalid map (Invalid characters)\n");
 			}
 		}
 	}
@@ -74,7 +74,6 @@ void	ft_check_for_walls(t_game *game)
 	int	y;
 
 	y = -1;
-	printf("NUMERO FILAS:%i \n", game->map_y);
 	while (game->map_matrix[++y])
 	{
 		x = -1;
@@ -82,10 +81,10 @@ void	ft_check_for_walls(t_game *game)
 		{
 			if (game->map_matrix[0][x] != '1'
 				|| game->map_matrix[game->map_y - 1][x] != '1')
-				ft_error("ERROR: Invalid map (Not surrounded by walls)");
+				ft_error("Error\n Invalid map (Not surrounded by walls)\n");
 			else if (game->map_matrix[y][0] != '1'
 				|| game->map_matrix[y][game->map_x - 1] != '1')
-				ft_error("ERROR: Invalid map (Not surrounded by walls)");
+				ft_error("Error\n Invalid map (Not surrounded by walls)\n");
 		}
 	}
 }
@@ -98,13 +97,17 @@ void	ft_check_for_rectangle(t_game *game)
 	i = 0;
 	j = 0;
 	game->map_x = ft_strlen(game->map_matrix[j]);
+	if (game->map_x >= 21)
+		ft_error("Error\n Invalid map (X AXE too long)\n");
 	j = -1;
 	while (game->map_matrix[++j])
 	{
 		if (game->map_x != (int)ft_strlen(game->map_matrix[j]))
-			ft_error("ERROR: Invalid map (Not rectangular)");
+			ft_error("Error\n Invalid map (Not rectangular)\n");
 	}
 	game->map_y = j;
+	if (game->map_y > 11)
+		ft_error("Error\n Invalid map (Y AXE too long)\n");
 }
 
 void	ft_check_valid_map(t_game *game)
