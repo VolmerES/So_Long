@@ -12,7 +12,7 @@
 
 ## Evaluation:
 
-![Captura de pantalla 2024-04-18 a las 15.51.46.png](Readme_img_/Captura_de_pantalla_2024-04-18_a_las_15.51.46.png)
+![Captura de pantalla 2024-04-18 a las 15.51.46.png](Readme_img/Captura_de_pantalla_2024-04-18_a_las_15.51.46.png)
 
 ## Table of Contents
 
@@ -72,7 +72,7 @@ make re - usa fclean + all, recompila.
 
 ---
 
-![So_long_gamplay_readme.gif](Readme_img_/So_long_gamplay_readme.gif)
+![So_long_gamplay_readme.gif](Readme_img/So_long_gamplay_readme.gif)
 
 ![So_long_gameplay_2.gif](Readme_img/So_long_gameplay_2.gif)
 
