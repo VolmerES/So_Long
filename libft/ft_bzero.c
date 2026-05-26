@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jdelorme <jdelorme@student.42madrid>       +#+  +:+       +#+        */
+/*   By: volmer <volmer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:47:56 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/10/17 15:02:26 by jdelorme         ###   ########.fr       */
+/*   Updated: 2026/05/26 11:48:03 by volmer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,8 @@
 void	ft_bzero(void *s, size_t len)
 {
 	char	*str;
-	size_t	i;
+	size_t	i = 0;
 
-	i = 0;
 	str = (char *)s;
 	while (i < len)
 	{
