@@ -6,7 +6,7 @@
 /*   By: volmer <volmer@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:47:56 by jdelorme          #+#    #+#             */
-/*   Updated: 2026/05/26 11:48:03 by volmer           ###   ########.fr       */
+/*   Updated: 2026/05/26 11:48:51 by volmer           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 void	ft_bzero(void *s, size_t len)
 {
 	char	*str;
-	size_t	i = 0;
+	size_t	i;
 
+	i = 0;
 	str = (char *)s;
 	while (i < len)
 	{
