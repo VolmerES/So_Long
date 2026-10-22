@@ -1,133 +1,72 @@
-# Readme So_Long
+# so_long
 
----
+![so_long cover](Readme_img/cover-so_long-bonus.png)
 
----
+> *And thanks for all the fish!*
 
-![cover-so_long-bonus.png](Readme_img/cover-so_long-bonus.png)
+A small 2D game written in C with the **MiniLibX** graphics library, built as part of the 42 Madrid
+common core. You move around a tile map, pick up every collectible and then reach the exit. The map is a
+plain text file, so anyone can design their own levels.
 
-## And thanks for all the fish!
+**Grade: 110/100**
 
----
+![Evaluation](Readme_img/Captura_de_pantalla_2024-04-18_a_las_15.51.46.png)
 
-## Evaluation:
+## Gameplay
 
-![Captura de pantalla 2024-04-18 a las 15.51.46.png](Readme_img/Captura_de_pantalla_2024-04-18_a_las_15.51.46.png)
+![Gameplay](Readme_img/So_long_gamplay_readme.gif)
 
-## Table of Contents
+![Gameplay 2](Readme_img/So_long_gameplay_2.gif)
 
-1. [What is ft_printf?](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-2. [What’s inside?](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-3. [How does it work?](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-4. [How to test ?](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-5. [Notes](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-6. [About Me](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
-7. [License](https://www.notion.so/Printf-Readme-c6233f0ec7234a818d3b524e93278b40?pvs=21)
+## Build and run
 
-## What is so_long?
-
----
-
-"So Long" was my fourth project at School 42, which required us to create a 2D video game (Pac-Man style) using the MLX library. The project involved memory management considerations and had the unique feature where the end user, wanting to execute the game, could create the game map using '0' and '1'.
-
-## What’s inside?
-
----
-
-| Maps | Some maps that you can use to play or test. |
-| --- | --- |
-| Img | All the sprites and textures needed for the map. |
-| Inc | Here is where you can find so_long.h, where you can see all data structures that are used for the game data. |
-| Libft | This is my own C library, with some standard and basic functions. |
-| Mlx | This is an Objective-C library, used for window and game management. |
-| Src | All of my own source code. |
-
-## How does it work?
-
-1. Clone the repo:
+It links against the macOS version of MiniLibX (OpenGL and AppKit), so it builds on macOS.
 
 ```bash
 git clone https://github.com/VolmerES/So_Long.git
-cd so_long/
+cd So_Long
+make
+./so_long Maps/map.ber
 ```
 
-1. Execute and enjoy:
+| Rule | What it does |
+|---|---|
+| `make` | Build the game |
+| `make run` | Play `Maps/map.ber` (build first) |
+| `make clean` | Remove object files |
+| `make fclean` | Remove object files and the binary |
+| `make re` | `fclean` + `make` |
 
-```bash
-make run
-```
+## Make your own map
 
-### Some other Makefile rules you can use:
+Maps are `.ber` files made of these characters:
 
-```bash
-make - compila los archivos obligatorios.
-make bonus - compila los archivos bonus.
-make all - compila todos los archivos (obligatorios + bonus)
-make clean - elimina todos los archivos *.o
-make fclean - elimina todos los archivos *.o y *.a (ejecutables)
-make re - usa fclean + all, recompila.
-```
+| Char | Meaning |
+|:-:|---|
+| `1` | Wall |
+| `0` | Floor |
+| `P` | Player start (exactly one) |
+| `C` | Collectible (at least one) |
+| `E` | Exit (exactly one) |
 
-## Screenshots
+![Map example](Readme_img/Screen_Shot_2024-04-18_at_4.37.36_PM.png)
 
----
+The map is validated before the game starts. It must be rectangular and fully enclosed by walls, and
+every collectible and the exit must be reachable from the player. If any rule fails, the game prints
+an error saying which one. `Maps/` has a valid map and some invalid ones to try.
 
-![So_long_gamplay_readme.gif](Readme_img/So_long_gamplay_readme.gif)
+## Repository layout
 
-![So_long_gameplay_2.gif](Readme_img/So_long_gameplay_2.gif)
-
-## Make your own map:
-
----
-
-1. The extension must be "*.ber".
-2. The map must be a square/rectangle.
-3. The map must be surrounded by walls.
-4. The map must have at least 1 or more collectibles, just 1 player, and 1 exit.
-5. All collectibles must be reachable.
-6. There needs to be a valid path between the player and the exit.
-
-Otherwise, when launching the game, it will show an error followed by a message about the mistake you made.
-
-## Let see what are each character:
+| Path | Contents |
+|---|---|
+| `src/` | Game source: map and path validation, rendering and player movement |
+| `inc/` | `so_long.h` with the game data structures |
+| `img/` | Sprites and textures |
+| `Maps/` | Sample maps, valid and invalid |
+| `libft/` | My own C library |
+| `mlx/` | MiniLibX |
 
 ---
 
-![Screen Shot 2024-04-18 at 4.37.36 PM.png](Readme_img/Screen_Shot_2024-04-18_at_4.37.36_PM.png)
-
-| 1 | Wall |
-| --- | --- |
-| 0 | Path |
-| E | Exit |
-| C | Collectable |
-| P | Player |
-
-You are now equipped to construct a map.
-
-## Executing you map:
-
----
-
-```jsx
-./so_long ./(pathofyourmap)/my_map.ber
-```
-
-In this game, the conclusion is reached when the player steps onto the exit tile after acquiring every collectible item.
-
-## 🚀 About Me
-
----
-
-I’m 42Network student at 42Madrid(Spain)
-
-You I track my progress through the common core at:
-
-More about:
-
-[https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)
-
-## License
-
----
-
-This project is licensed under the MIT License. See the [LICENSE](https://www.notion.so/LICENSE.md) file for details.
+Made by **Juan Bautista Delorme** (`jdelorme`) at 42 Madrid ·
+[Portfolio](https://juandelorme-portfolio.volmer.es) · [42 intra](https://profile.intra.42.fr/users/jdelorme)
